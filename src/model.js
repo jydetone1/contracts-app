@@ -75,17 +75,11 @@ Job.init(
   }
 );
 
-//one-to-many
 Profile.hasMany(Contract, { as: 'Contractor', foreignKey: 'ContractorId' });
-//one-to-one
 Contract.belongsTo(Profile, { as: 'Contractor' });
-// One to many
 Profile.hasMany(Contract, { as: 'Client', foreignKey: 'ClientId' });
-// One to one
 Contract.belongsTo(Profile, { as: 'Client' });
-// One to many
 Contract.hasMany(Job);
-// One to one
 Job.belongsTo(Contract);
 
 module.exports = {
