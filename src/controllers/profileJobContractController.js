@@ -14,7 +14,10 @@ const profileJobContractController = {
         include: ['Client', 'Contractor'],
       });
       if (!contract) return res.status(404).send('Contract not found');
-      res.json(contract);
+      res.status(200).json({
+        success: true,
+        contract,
+      });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
     }
@@ -31,7 +34,10 @@ const profileJobContractController = {
         },
         include: ['Client', 'Contractor'],
       });
-      res.json(contracts);
+      res.status(200).json({
+        success: true,
+        contracts,
+      });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
     }
@@ -51,7 +57,10 @@ const profileJobContractController = {
           attributes: [],
         },
       });
-      res.json(jobs);
+      res.status(200).json({
+        success: true,
+        jobs,
+      });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
     }
@@ -165,7 +174,10 @@ const profileJobContractController = {
         include: ['Contractor'],
       });
 
-      res.json(bestProfession);
+      res.status(200).json({
+        success: true,
+        bestProfession,
+      });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
     }
@@ -193,7 +205,10 @@ const profileJobContractController = {
         limit,
       });
 
-      res.json(bestClients);
+      res.status(200).json({
+        success: true,
+        bestClients,
+      });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
     }
