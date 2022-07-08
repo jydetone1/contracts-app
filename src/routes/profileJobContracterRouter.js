@@ -8,7 +8,7 @@ router.get(
   profileJobContractController.getContractId
 );
 
-router.get('/contracts', profileJobContractController.getContracts);
+router.get('/contracts', getProfile, profileJobContractController.getContracts);
 
 router.get(
   '/jobs/unpaid',
