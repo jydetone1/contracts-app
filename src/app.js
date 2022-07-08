@@ -8,6 +8,6 @@ app.use(bodyParser.json());
 app.set('sequelize', sequelize);
 app.set('models', sequelize.models);
 
-app.use('/api/v1/', require('./routes/ProfileJobContracterRouter'));
+app.use('/api/v1', require('./routes/profileJobContracterRouter'));
 
 module.exports = app;

@@ -1,43 +1,43 @@
 const router = require('express').Router();
 const { getProfile } = require('../middleware/getProfile');
-const ProfileJobContractController = require('../controllers/ProfileJobContractController');
+const profileJobContractController = require('../controllers/profileJobContractController');
 
 router.get(
   '/contracts/:id',
   getProfile,
-  ProfileJobContractController.getContractId
+  profileJobContractController.getContractId
 );
 
-router.get('/contracts', ProfileJobContractController.getContracts);
+router.get('/contracts', profileJobContractController.getContracts);
 
 router.get(
   '/jobs/unpaid',
   getProfile,
-  ProfileJobContractController.getJobsUnpaid
+  profileJobContractController.getJobsUnpaid
 );
 
 router.post(
   '/jobs/:job_id/pay',
   getProfile,
-  ProfileJobContractController.jobsPaid
+  profileJobContractController.jobsPaid
 );
 
 router.post(
   '/balances/deposit/:userId',
   getProfile,
-  ProfileJobContractController.despositCash
+  profileJobContractController.despositCash
 );
 
 router.get(
   '/admin/best-profession',
   getProfile,
-  ProfileJobContractController.getBestProfession
+  profileJobContractController.getBestProfession
 );
 
 router.get(
   '/admin/best-clients',
   getProfile,
-  ProfileJobContractController.getBestClients
+  profileJobContractController.getBestClients
 );
 
 module.exports = router;
