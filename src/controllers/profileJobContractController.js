@@ -154,29 +154,47 @@ const profileJobContractController = {
   },
 
   getBestProfession: async (req, res) => {
-    const { Profile } = req.app.get('models');
-    const { id: profileId } = req.profile;
+    const { Contract, Job, Profile } = req.app.get('models');
     const { start, end } = req.query;
+    const { id: profileId } = req.profile;
 
     try {
-      const bestProfession = await Profile.findOne({
-        order: [['balance', 'DESC']],
+      const bestProfession = await Job.findOne({
         where: {
-          type: 'contractor',
           ContractorId: profileId,
-          balance: {
-            [Op.gte]: 0,
-          },
-          createdAt: {
-            [Op.between]: [start, end],
-          },
+          paid: true,
+          ...(start &&
+            end && {
+              paymentDate: {
+                [Op.gte]: start,
+                [Op.lte]: end,
+              },
+            }),
         },
-        include: ['Contractor'],
+        attributes: [[sequelize.fn('sum', sequelize.col('price')), 'profit']],
+        group: 'Contract.Contractor.profession',
+        order: [[sequelize.col('profit'), 'DESC']],
+        include: [
+          {
+            model: Contract,
+            required: true,
+            include: [
+              {
+                model: Profile,
+                as: 'Contractor',
+                attributes: ['profession'],
+                required: true,
+              },
+            ],
+          },
+        ],
       });
 
+      if (!bestProfession) return res.status(404).send('No best profession');
       res.status(200).json({
         success: true,
-        bestProfession,
+        profession: bestProfession.Contract.Contractor.profession,
+        profit: bestProfession.get('profit'),
       });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
@@ -184,30 +202,56 @@ const profileJobContractController = {
   },
 
   getBestClients: async (req, res) => {
-    const { Profile } = req.app.get('models');
-    const { id: profileId } = req.profile;
+    const { Contract, Job, Profile } = req.app.get('models');
     const { start, end, limit = 2 } = req.query;
+    const { id: profileId } = req.profile;
 
     try {
-      const bestClients = await Profile.findOne({
-        order: [['balance', 'DESC']],
+      const bestClients = await Job.findAll({
+        attributes: [
+          [sequelize.fn('sum', sequelize.col('price')), 'totalPayments'],
+        ],
         where: {
-          type: 'client',
           ClientId: profileId,
-          balance: {
-            [Op.gte]: 0,
-          },
-          createdAt: {
-            [Op.between]: [start, end],
-          },
+          paid: true,
+          ...(start &&
+            end && {
+              paymentDate: {
+                [Op.gte]: start,
+                [Op.lte]: end,
+              },
+            }),
         },
-        include: ['Client'],
+        group: 'Contract.Client.id',
+        order: [[sequelize.col('totalPayments'), 'DESC']],
         limit,
+        include: [
+          {
+            model: Contract,
+            required: true,
+            include: [
+              {
+                model: Profile,
+                as: 'Client',
+                required: true,
+              },
+            ],
+          },
+        ],
       });
 
+      if (!bestClients) return res.status(404).send('No best clients');
+      const clients = bestClients.map((obj) => ({
+        id: obj.Contract.Client.id,
+        fullName: [
+          obj.Contract.Client.firstName,
+          obj.Contract.Client.lastName,
+        ].join(' '),
+        totalPayments: obj.get('totalPayments'),
+      }));
       res.status(200).json({
         success: true,
-        bestClients,
+        clients,
       });
     } catch (error) {
       return res.status(500).send({ error: 'Something went wrong' });
